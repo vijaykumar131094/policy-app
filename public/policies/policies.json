@@ -1,0 +1,34 @@
+{
+    "1": {
+        "title": "Data Policy",
+        "description": "This policy outlines how data should be handled and reviewed.",
+        "actionPoints": [
+            {
+                "text": "Need to review every 3 months",
+                "status": "pending",
+                "evidence": null
+            },
+            {
+                "text": "Conduct a network assessment",
+                "status": "pending",
+                "evidence": null
+            }
+        ]
+    },
+    "2": {
+        "title": "Security Policy",
+        "description": "This policy ensures proper security measures are implemented.",
+        "actionPoints": [
+            {
+                "text": "Ensure encryption for all communications",
+                "status": "completed",
+                "evidence": "Encrypted_Communication_Details.pdf"
+            },
+            {
+                "text": "Implement multi-factor authentication",
+                "status": "pending",
+                "evidence": null
+            }
+        ]
+    }
+}
