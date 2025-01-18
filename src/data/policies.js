@@ -1,70 +1,79 @@
-const policies = {
-    1: {
-      id: "1",
-      title: "Data Protection Policy",
+const policies = [
+    {
+      id: "data-privacy-policy",
+      title: "Data Privacy Policy",
       text: `
-  Definitions
-  
-  Organisation: [Insert organisation name], a company registered under number [company number].
-  DPA: The Data Protection Act 2018 which implements the EU’s General Data Protection Regulation.
-  Responsible Person: [Insert name of person responsible for data protection within the Organisation].
-  Register of Systems: A register of all systems or contexts in which personal data is processed by the Organisation.
-  
-  1. Data protection principles:
-  The Organisation is committed to processing data in accordance with its responsibilities under the DPA.
-  `,
+        [Insert organisation name] is committed to protecting personal data.
+        This policy outlines the principles of data privacy.
+        Data must be collected for specific, explicit, and legitimate purposes.
+        Personal data must be accurate and kept up to date.
+        Data should only be retained for as long as necessary.
+        [Insert responsible person] is responsible for implementing this policy.
+        This policy is reviewed annually to ensure compliance.
+      `,
       placeholders: {
-        "[Insert organisation name]": "",
-        "[company number]": "",
+        "[Insert organisation name]": "Your Organisation",
+        "[Insert responsible person]": "John Doe",
       },
       actionPoints: [
         {
-          id: "1",
-          description: "Review data policies every 6 months.",
-          status: "Pending",
+          id: "review-policy",
+          description: "Review policy compliance every 6 months.",
+          steps: [
+            "Gather compliance data from all departments.",
+            "Compare current practices to GDPR standards.",
+            "Update any non-compliant processes.",
+          ],
         },
         {
-          id: "2",
-          description: "Ensure compliance with GDPR regulations.",
-          status: "In Progress",
+          id: "employee-training",
+          description: "Conduct employee training on data privacy.",
+          steps: [
+            "Schedule training sessions for all teams.",
+            "Cover GDPR basics and company-specific policies.",
+            "Provide an assessment at the end of training.",
+          ],
         },
       ],
-      lastUpdated: null,
-      changes: [],
     },
-    2: {
-      id: "2",
-      title: "Security Policy",
+    {
+      id: "security-guidelines",
+      title: "Security Guidelines",
       text: `
-  Security Guidelines
-  
-  1. All employees of [Insert organisation name] must use 2FA for logging into company systems.
-  2. Conduct monthly vulnerability scans as per [company policy].
-  3. Review and update security policies annually.
-  
-  All security-related data must be stored securely and reviewed by [Insert security manager name].
-  `,
+        [Insert organisation name] ensures the security of its systems.
+        Employees must use strong passwords and change them regularly.
+        Unauthorized access to sensitive data is prohibited.
+        [Insert responsible person] oversees security implementations.
+        Security breaches must be reported immediately.
+        Systems must be regularly updated to avoid vulnerabilities.
+        This policy is reviewed semi-annually for effectiveness.
+      `,
       placeholders: {
-        "[Insert organisation name]": "",
-        "[company policy]": "",
-        "[Insert security manager name]": "",
+        "[Insert organisation name]": "Your Organisation",
+        "[Insert responsible person]": "Jane Smith",
       },
       actionPoints: [
         {
-          id: "1",
-          description: "Conduct monthly vulnerability scans.",
-          status: "Completed",
+          id: "audit-systems",
+          description: "Conduct system audits every 3 months.",
+          steps: [
+            "Review user access logs for unauthorized access.",
+            "Ensure firewalls and antivirus are updated.",
+            "Document and address any vulnerabilities.",
+          ],
         },
         {
-          id: "2",
-          description: "Update security policies annually.",
-          status: "Pending",
+          id: "incident-response",
+          description: "Develop and implement an incident response plan.",
+          steps: [
+            "Identify key stakeholders for incident management.",
+            "Outline a step-by-step process for responding to breaches.",
+            "Train employees on the response plan.",
+          ],
         },
       ],
-      lastUpdated: null,
-      changes: [],
     },
-  };
+  ];
   
   export default policies;
   

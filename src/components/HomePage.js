@@ -1,109 +1,106 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import policiesData from "../data/policies";
+import policiesData from "../data/policies"; // Use a mutable copy
 import "../styles/styles.css";
-import { motion } from "framer-motion";
 
 const HomePage = () => {
+  const [policies, setPolicies] = useState(policiesData); // Store policies in state
+  const [selectedPolicy, setSelectedPolicy] = useState(null);
+  const [editablePlaceholders, setEditablePlaceholders] = useState({});
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [changeLog, setChangeLog] = useState([]); // Track changes with timestamps
   const navigate = useNavigate();
-  const [policies, setPolicies] = useState(policiesData); // Editable policies
-  const [selectedPolicy, setSelectedPolicy] = useState(null); // Selected policy
-  const [editablePlaceholders, setEditablePlaceholders] = useState({}); // Editable placeholders
 
-  // Handle policy selection
   const handlePolicyClick = (policy) => {
     setSelectedPolicy(policy);
-    setEditablePlaceholders(policy.placeholders); // Load placeholders for editing
+    setEditablePlaceholders(policy.placeholders || {});
+    setIsEditMode(false); // Reset edit mode when switching policies
   };
 
-  // Handle placeholder change
   const handlePlaceholderChange = (key, value) => {
-    setEditablePlaceholders((prev) => ({ ...prev, [key]: value }));
+    setEditablePlaceholders((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
   };
 
-  // Save changes
+  const handleEdit = () => {
+    setIsEditMode(true);
+  };
+
   const handleSave = () => {
     if (!selectedPolicy) return;
 
-    const changes = [];
-    Object.keys(selectedPolicy.placeholders).forEach((key) => {
-      if (selectedPolicy.placeholders[key] !== editablePlaceholders[key]) {
-        changes.push({
-          placeholder: key,
-          before: selectedPolicy.placeholders[key] || "(empty)",
-          after: editablePlaceholders[key] || "(empty)",
-        });
-      }
+    // Log changes with timestamps
+    const changes = Object.keys(editablePlaceholders).map((key) => {
+      const oldValue = selectedPolicy.placeholders[key] || "Not Set";
+      const newValue = editablePlaceholders[key];
+      return `Updated ${key}: "${oldValue}" -> "${newValue}"`;
     });
 
-    const updatedPolicies = {
-      ...policies,
-      [selectedPolicy.id]: {
-        ...selectedPolicy,
-        placeholders: editablePlaceholders, // Save updated placeholders
-        lastUpdated: new Date().toLocaleString(),
-        changes,
-      },
-    };
+    setChangeLog((prevLog) => [
+      ...prevLog,
+      ...changes.map((change) => ({
+        change,
+        timestamp: new Date().toLocaleString(),
+      })),
+    ]);
+
+    // Update the global policies array
+    const updatedPolicies = policies.map((policy) => {
+      if (policy.id === selectedPolicy.id) {
+        return {
+          ...policy,
+          placeholders: { ...editablePlaceholders },
+        };
+      }
+      return policy;
+    });
 
     setPolicies(updatedPolicies);
+    setSelectedPolicy((prevPolicy) => ({
+      ...prevPolicy,
+      placeholders: { ...editablePlaceholders },
+    }));
+    setIsEditMode(false);
+
     alert("Changes saved successfully!");
   };
 
-  const handleNavigate = () => {
-    if (selectedPolicy) {
-      navigate(`/policy/${selectedPolicy.id}`); // Navigate to action points page
-    }
+  const handleViewActionablePoints = (policyId) => {
+    navigate(`/policy/${policyId}/actionable-points`);
   };
 
   return (
     <div className="homepage-container">
-      {/* Sidebar: List of Policies */}
-      <motion.div
-        className="policies-sidebar"
-        initial={{ x: -100, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.8 }}
-      >
+      {/* Left Sidebar */}
+      <div className="policies-sidebar">
         <h3>Policies</h3>
         <ul>
-          {Object.values(policies).map((policy) => (
-            <motion.li
+          {policies.map((policy) => (
+            <li
               key={policy.id}
               className={`policy-item ${
                 selectedPolicy?.id === policy.id ? "active" : ""
               }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
               onClick={() => handlePolicyClick(policy)}
             >
               {policy.title}
-            </motion.li>
+            </li>
           ))}
         </ul>
-      </motion.div>
+      </div>
 
-      {/* Main Content: Policy Details */}
-      <motion.div
-        className="policy-content"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
+      {/* Right Content */}
+      <div className="policy-content">
         {selectedPolicy ? (
           <>
-            <motion.h2
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.6 }}
-            >
-              {selectedPolicy.title}
-            </motion.h2>
+            <h2>{selectedPolicy.title}</h2>
             <div className="policy-text">
               {selectedPolicy.text.split("\n").map((line, index) => (
                 <p key={index}>
                   {line.split(/(\[.*?\])/).map((part, idx) => {
-                    if (part.startsWith("[") && part.endsWith("]")) {
+                    if (isEditMode && part.startsWith("[") && part.endsWith("]")) {
                       return (
                         <input
                           key={idx}
@@ -121,42 +118,38 @@ const HomePage = () => {
                 </p>
               ))}
             </div>
-            <button className="save-button" onClick={handleSave}>
-              Save
-            </button>
-            <button className="action-button" onClick={handleNavigate}>
-              View Action Points & Evidence
-            </button>
-            {selectedPolicy.lastUpdated && (
-              <motion.div
-                className="update-info"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.5 }}
+            <div className="policy-actions">
+              {!isEditMode ? (
+                <button className="edit-button" onClick={handleEdit}>
+                  Edit
+                </button>
+              ) : (
+                <button className="save-button" onClick={handleSave}>
+                  Save
+                </button>
+              )}
+              <button
+                className="action-button"
+                onClick={() => handleViewActionablePoints(selectedPolicy.id)}
               >
-                <p>Last Updated: {selectedPolicy.lastUpdated}</p>
-                <h4>Changes Made:</h4>
-                <ul>
-                  {selectedPolicy.changes.map((change, idx) => (
-                    <li key={idx}>
-                      <strong>{change.placeholder}:</strong> "{change.before}" ➔ "
-                      {change.after}"
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            )}
+                View Actionable Points
+              </button>
+            </div>
+            <div className="change-log">
+              <h4>Change Log:</h4>
+              <ul>
+                {changeLog.map((log, index) => (
+                  <li key={index}>
+                    {log.change} (Timestamp: {log.timestamp})
+                  </li>
+                ))}
+              </ul>
+            </div>
           </>
         ) : (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            Please select a policy to view and edit details.
-          </motion.p>
+          <p>Please select a policy to view its details.</p>
         )}
-      </motion.div>
+      </div>
     </div>
   );
 };
